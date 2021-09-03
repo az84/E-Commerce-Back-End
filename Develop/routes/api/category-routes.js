@@ -6,25 +6,57 @@ const { Category, Product } = require('../../models');
 router.get('/', (req, res) => {
   // find all categories
   // be sure to include its associated Products
-  const data = await Category.findAll({
-    include: Product
-  });
-  return res.status(200).json(data);
+  Category.findAll({
+    include: {
+        model: Product,
+        attributes: ['id', 'product_name', 'price', 'stock', 'category_id']
+    }
+})
+.then(catRoute => {
+    if (!catRoute) {
+        res.status(404).json({ message: 'Error! no categories!' });
+        return;
+    }
+    res.json(catRoute);
+})
+.catch(err => {
+    res.status(500).json(err)
+});
 });
 
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
-  const data = await Category.findByPk(req.params.id, {
-    include: Product
-  });
-  return res.status(200).json(data);
+  Category.findOne({
+    where: {
+        id: req.params.id
+    },
+    include: {
+        model: Product,
+        attributes: ['id', 'product_name', 'price', 'stock', 'category_id']
+    }
+})
+.then(catRoute => {
+    if (!catRoute) {
+        res.status(404).json({ message: 'No categories found' });
+        return;
+    }
+    res.json(catRoute);
+})
+.catch(err => {
+    res.status(500).json(err)
+});
 });
 
 router.post('/', (req, res) => {
   // create a new category
-  const cat = await Category.create(req.body);
-  return res.status(201).json(cat); 
+  Category.create({
+    category_name: req.body.category_name
+})
+.then(dbCatData => res.json(dbCatData))
+.catch(err => {
+    res.status(500).json(err);
+});
 });
 
 router.put('/:id', (req, res) => {
