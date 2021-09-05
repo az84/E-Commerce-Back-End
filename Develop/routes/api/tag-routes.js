@@ -59,7 +59,7 @@ router.put('/:id', (req, res) => {
     }
 })
 .then(tagApi => {
-    if (!dbTagData) {
+    if (!tagApi) {
         res.status(404).json({ message: 'No tag found with this id' });
         return;
     }
